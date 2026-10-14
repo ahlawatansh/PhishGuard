@@ -116,3 +116,32 @@ def test_events_endpoint():
         assert "type" in event
         assert "severity" in event
         assert "message" in event
+
+
+def test_events_expiration_and_clear():
+    engine = get_network_engine()
+    engine.log_event("SYSTEM", "INFO", "Fresh event for expiration test")
+    assert len(engine.events) > 0
+
+    old_event = {
+        "id": "old-test",
+        "timestamp": "2020-01-01T00:00:00+00:00",
+        "created_at_ts": 1000.0,
+        "type": "SYSTEM",
+        "severity": "INFO",
+        "message": "Ancient event that should be purged",
+        "details": {}
+    }
+    engine.events.append(old_event)
+    assert any(e["id"] == "old-test" for e in engine.events)
+
+    engine.clean_expired_events()
+    assert not any(e["id"] == "old-test" for e in engine.events)
+
+    res_del = client.delete("/api/events")
+    assert res_del.status_code == 200
+    assert res_del.json()["success"] is True
+
+    res_empty = client.get("/api/events")
+    assert res_empty.status_code == 200
+    assert len(res_empty.json()) == 0

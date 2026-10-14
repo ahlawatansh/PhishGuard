@@ -47,6 +47,14 @@ export const api = {
     return res.json()
   },
 
+  async clearEvents(): Promise<{ success: boolean; cleared_count: number }> {
+    const res = await fetch(`${BASE_URL}/api/events`, {
+      method: 'DELETE'
+    })
+    if (!res.ok) throw new Error('Failed to clear security events')
+    return res.json()
+  },
+
   async getFirewallRules(): Promise<FirewallRule[]> {
     const res = await fetch(`${BASE_URL}/api/firewall/rules`)
     if (!res.ok) throw new Error('Failed to fetch firewall rules')

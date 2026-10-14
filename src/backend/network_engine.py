@@ -10,8 +10,9 @@ from urllib.parse import urlparse
 
 
 class NetworkEngine:
-    def __init__(self, max_events: int = 500):
+    def __init__(self, max_events: int = 500, event_ttl_seconds: int = 3600):
         self.max_events = max_events
+        self.event_ttl_seconds = event_ttl_seconds
         self.events: List[Dict[str, Any]] = []
         self.firewall_rules: List[Dict[str, Any]] = []
         self.domain_age_cache: Dict[str, Dict[str, Any]] = {}
@@ -31,15 +32,44 @@ class NetworkEngine:
             action="BLOCK"
         )
 
+    def clean_expired_events(self, ttl_seconds: Optional[int] = None) -> int:
+        ttl = self.event_ttl_seconds if ttl_seconds is None else ttl_seconds
+        now_ts = time.time()
+        initial_len = len(self.events)
+        valid_events = []
+        for e in self.events:
+            created = e.get("created_at_ts")
+            if created is None:
+                try:
+                    ts_str = e.get("timestamp", "")
+                    if ts_str.endswith("Z"):
+                        ts_str = ts_str[:-1] + "+00:00"
+                    created = datetime.fromisoformat(ts_str).timestamp()
+                except Exception:
+                    created = now_ts
+                e["created_at_ts"] = created
+            if (now_ts - created) < ttl:
+                valid_events.append(e)
+        self.events = valid_events
+        return initial_len - len(self.events)
+
+    def clear_events(self) -> int:
+        cleared_count = len(self.events)
+        self.events.clear()
+        return cleared_count
+
     def log_event(self, event_type: str, severity: str, message: str, details: Optional[Dict[str, Any]] = None):
+        now_ts = time.time()
         event = {
             "id": str(uuid.uuid4())[:8],
             "timestamp": datetime.now(timezone.utc).isoformat(),
+            "created_at_ts": now_ts,
             "type": event_type,
             "severity": severity,
             "message": message,
             "details": details or {}
         }
+        self.clean_expired_events()
         self.events.insert(0, event)
         if len(self.events) > self.max_events:
             self.events.pop()
@@ -60,6 +90,7 @@ class NetworkEngine:
             self.request_stats["response_times_ms"].pop(0)
 
     def get_network_stats(self) -> Dict[str, Any]:
+        self.clean_expired_events()
         total = self.request_stats["total_requests"]
         times = self.request_stats["response_times_ms"]
         avg_latency = (self.request_stats["total_response_time_ms"] / total) if total > 0 else 0.0

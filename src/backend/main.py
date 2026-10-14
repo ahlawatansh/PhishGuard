@@ -153,10 +153,18 @@ def lookup_dns(domain: str):
 @app.get("/api/events")
 def get_security_events(limit: int = 50, event_type: Optional[str] = None):
     network_engine = get_network_engine()
+    network_engine.clean_expired_events()
     events = network_engine.events
     if event_type:
         events = [e for e in events if e["type"] == event_type.upper()]
     return events[:limit]
+
+
+@app.delete("/api/events")
+def clear_security_events():
+    network_engine = get_network_engine()
+    cleared = network_engine.clear_events()
+    return {"success": True, "cleared_count": cleared}
 
 
 @app.get("/api/firewall/rules")

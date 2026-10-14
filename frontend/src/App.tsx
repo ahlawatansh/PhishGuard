@@ -950,15 +950,32 @@ export function App() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
               <div>
                 <h2 className="text-base sm:text-lg font-extrabold font-heading text-[#18181B]">Security Event History</h2>
-                <p className="text-xs text-slate-500 font-medium">Real-time cryptographic, network, and threat audit trail</p>
+                <p className="text-xs text-slate-500 font-medium">Real-time cryptographic, network, and threat audit trail • Auto-cleans in 1 hr</p>
               </div>
-              <button
-                onClick={loadGlobalData}
-                className="h-8 px-3.5 rounded-full bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer self-start sm:self-auto"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>Refresh</span>
-              </button>
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await api.clearEvents()
+                      setEvents([])
+                    } catch (err) {
+                      console.error('Failed to clear events', err)
+                    }
+                  }}
+                  className="h-8 px-3.5 rounded-full bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Clear</span>
+                </button>
+                <button
+                  onClick={loadGlobalData}
+                  className="h-8 px-3.5 rounded-full bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Refresh</span>
+                </button>
+              </div>
             </div>
 
             <div className="relative mb-3">
@@ -1024,37 +1041,42 @@ export function App() {
               </button>
             </div>
 
-            <div className="divide-y divide-slate-100">
-              {events
-                .filter((ev) => {
-                  if (!eventFilter) return true
-                  const q = eventFilter.toLowerCase()
-                  return (
-                    ev.message.toLowerCase().includes(q) ||
-                    ev.type.toLowerCase().includes(q) ||
-                    ev.severity.toLowerCase().includes(q)
-                  )
-                })
-                .map((ev) => (
-                  <div key={ev.id} className="py-3.5 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`w-2 h-2 rounded-full shrink-0 ${ev.severity === 'CRITICAL' ? 'bg-[#18181B]' : 'bg-[#15803D]'}`} />
-                      <div className="min-w-0">
-                        <div className="text-xs font-semibold text-slate-900">{ev.message}</div>
-                        <div className="text-[10px] text-slate-400 font-medium">{new Date(ev.timestamp).toLocaleString()} • {ev.type}</div>
+            {(() => {
+              const visibleEvents = events.filter((ev) => {
+                const eventAgeMs = Date.now() - new Date(ev.timestamp).getTime()
+                if (eventAgeMs > 60 * 60 * 1000) return false
+                if (!eventFilter) return true
+                const q = eventFilter.toLowerCase()
+                return (
+                  ev.message.toLowerCase().includes(q) ||
+                  ev.type.toLowerCase().includes(q) ||
+                  ev.severity.toLowerCase().includes(q)
+                )
+              })
+              return (
+                <div className="divide-y divide-slate-100">
+                  {visibleEvents.map((ev) => (
+                    <div key={ev.id} className="py-3.5 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`w-2 h-2 rounded-full shrink-0 ${ev.severity === 'CRITICAL' ? 'bg-[#18181B]' : 'bg-[#15803D]'}`} />
+                        <div className="min-w-0">
+                          <div className="text-xs font-semibold text-slate-900">{ev.message}</div>
+                          <div className="text-[10px] text-slate-400 font-medium">{new Date(ev.timestamp).toLocaleString()} • {ev.type}</div>
+                        </div>
                       </div>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                        ev.severity === 'CRITICAL' ? 'bg-[#18181B] text-white' : 'bg-slate-100 text-slate-600'
+                      }`}>
+                        {ev.severity}
+                      </span>
                     </div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                      ev.severity === 'CRITICAL' ? 'bg-[#18181B] text-white' : 'bg-slate-100 text-slate-600'
-                    }`}>
-                      {ev.severity}
-                    </span>
-                  </div>
-                ))}
-              {events.length === 0 && (
-                <div className="py-8 text-center text-xs text-slate-400">No events logged yet.</div>
-              )}
-            </div>
+                  ))}
+                  {visibleEvents.length === 0 && (
+                    <div className="py-8 text-center text-xs text-slate-400">No events logged yet.</div>
+                  )}
+                </div>
+              )
+            })()}
           </div>
         )}
       </main>
