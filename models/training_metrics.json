@@ -1,0 +1,66 @@
+{
+  "best_model_name": "XGBoost Classifier",
+  "evaluation_metrics": {
+    "accuracy": 0.9620292454131605,
+    "precision": 0.9674649120933114,
+    "recall": 0.9401897485934937,
+    "f1_score": 0.953632343651295,
+    "roc_auc": 0.9930454775672336,
+    "confusion_matrix": {
+      "true_negative": 66292,
+      "false_positive": 1523,
+      "false_negative": 2881,
+      "true_positive": 45288
+    }
+  },
+  "candidate_comparisons": [
+    {
+      "Model": "Logistic Regression",
+      "Accuracy": 0.9162212029245413,
+      "Precision": 0.9149436698752536,
+      "Recall": 0.8800888538271503,
+      "F1": 0.8971778673692898,
+      "ROC_AUC": 0.9727124035095982,
+      "Fit_Time_s": 2.9645421504974365,
+      "Latency_ms": 0.0003907870121504754
+    },
+    {
+      "Model": "HistGradientBoosting",
+      "Accuracy": 0.9528210787694854,
+      "Precision": 0.9553569524134548,
+      "Recall": 0.9298511490792833,
+      "F1": 0.9424315111728317,
+      "ROC_AUC": 0.9902185572339758,
+      "Fit_Time_s": 18.48464298248291,
+      "Latency_ms": 0.00474438870885583
+    },
+    {
+      "Model": "XGBoost Classifier",
+      "Accuracy": 0.9620292454131605,
+      "Precision": 0.9674649120933114,
+      "Recall": 0.9401897485934937,
+      "F1": 0.953632343651295,
+      "ROC_AUC": 0.9930454775672336,
+      "Fit_Time_s": 8.75318193435669,
+      "Latency_ms": 0.002895960200653518
+    }
+  ],
+  "dataset_statistics": {
+    "source": "archive (21)/final_dataset.csv",
+    "total_records": 579920,
+    "train_records": 463936,
+    "test_records": 115984,
+    "class_counts": {
+      "0": 339074,
+      "1": 240846
+    }
+  },
+  "metadata": {
+    "feature_count": 55,
+    "approach": "Approach A (Deterministic URL-Only Lexical Features)",
+    "leakage_free": true,
+    "random_seed": 42,
+    "timestamp": "2026-10-13T16:39:29Z",
+    "python_version": "3.14.5"
+  }
+}
