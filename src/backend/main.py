@@ -101,6 +101,14 @@ def predict_url(req: PredictRequest):
             "error": str(e)
         }
 
+    safety_report = network_engine.generate_safety_report(
+        result["normalized_url"],
+        result,
+        result["network_telemetry"],
+        result["is_firewall_blocked"]
+    )
+    result["safety_report"] = safety_report
+
     sev = "CRITICAL" if result["is_phishing"] else "INFO"
     msg = f"URL scan completed: '{raw_url}' classified as {result['verdict'].upper()} (Risk: {result['risk_score']*100:.1f}%)"
     if blocked_rule:
@@ -112,7 +120,8 @@ def predict_url(req: PredictRequest):
         "risk_score": result["risk_score"],
         "indicators": result["indicators"],
         "is_firewall_blocked": result["is_firewall_blocked"],
-        "network_telemetry": result["network_telemetry"]
+        "network_telemetry": result["network_telemetry"],
+        "safety_report": result["safety_report"]
     })
     network_engine.record_request_metric(result["inference_time_ms"], is_prediction=True)
 

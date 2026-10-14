@@ -33,6 +33,10 @@ def test_predict_endpoint_valid_url():
     assert "risk_score" in data
     assert "indicators" in data
     assert "is_firewall_blocked" in data
+    assert "safety_report" in data
+    assert "headline" in data["safety_report"]
+    assert "observations" in data["safety_report"]
+    assert "recommendation" in data["safety_report"]
 
 
 def test_predict_endpoint_empty_and_invalid():

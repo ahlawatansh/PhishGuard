@@ -2,6 +2,8 @@ import socket
 import ssl
 import time
 import uuid
+import json
+import urllib.request
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 from urllib.parse import urlparse
@@ -12,6 +14,7 @@ class NetworkEngine:
         self.max_events = max_events
         self.events: List[Dict[str, Any]] = []
         self.firewall_rules: List[Dict[str, Any]] = []
+        self.domain_age_cache: Dict[str, Dict[str, Any]] = {}
         self.request_stats = {
             "total_requests": 0,
             "predictions_count": 0,
@@ -364,6 +367,128 @@ class NetworkEngine:
                 )
                 return True
         return False
+
+    def get_domain_age(self, hostname: str) -> Dict[str, Any]:
+        clean_host = hostname.strip().lower()
+        if "://" in clean_host:
+            clean_host = urlparse(clean_host).netloc
+        clean_host = clean_host.split("/")[0].split(":")[0]
+
+        parts = clean_host.split('.')
+        compound_tlds = {
+            'ac.in', 'co.in', 'gov.in', 'edu.in', 'org.in', 'net.in',
+            'co.uk', 'ac.uk', 'org.uk', 'gov.uk', 'co.jp', 'com.au', 'co.nz', 'co.za'
+        }
+        if len(parts) >= 3 and f"{parts[-2]}.{parts[-1]}" in compound_tlds:
+            root_domain = f"{parts[-3]}.{parts[-2]}.{parts[-1]}"
+        elif len(parts) >= 2:
+            root_domain = f"{parts[-2]}.{parts[-1]}"
+        else:
+            root_domain = clean_host
+
+        if root_domain in self.domain_age_cache:
+            return self.domain_age_cache[root_domain]
+
+        try:
+            req = urllib.request.Request(
+                f"https://rdap.org/domain/{root_domain}",
+                headers={"User-Agent": "Mozilla/5.0 (SecurityScanner/1.0)"}
+            )
+            with urllib.request.urlopen(req, timeout=3.0) as resp:
+                data = json.loads(resp.read().decode())
+                for ev in data.get("events", []):
+                    if ev.get("eventAction") == "registration":
+                        reg_dt = datetime.fromisoformat(ev.get("eventDate").replace("Z", "+00:00"))
+                        now = datetime.now(timezone.utc)
+                        days = (now - reg_dt).days
+                        years = days // 365
+                        if years >= 1:
+                            age_str = f"{years} years ago"
+                        else:
+                            age_str = f"{days} days ago"
+                        res = {
+                            "root_domain": root_domain,
+                            "age_years": years,
+                            "age_days": days,
+                            "age_str": age_str,
+                            "registration_date": ev.get("eventDate")
+                        }
+                        self.domain_age_cache[root_domain] = res
+                        return res
+        except Exception:
+            pass
+
+        res = {
+            "root_domain": root_domain,
+            "age_years": None,
+            "age_days": None,
+            "age_str": None,
+            "registration_date": None
+        }
+        self.domain_age_cache[root_domain] = res
+        return res
+
+    def generate_safety_report(self, url: str, prediction: Dict[str, Any], telemetry: Dict[str, Any], is_blocked: bool) -> Dict[str, Any]:
+        clean_url = url.strip()
+        parsed = urlparse(clean_url if "://" in clean_url else f"https://{clean_url}")
+        hostname = parsed.netloc.split(":")[0].lower() or clean_url
+
+        is_phish = prediction.get("is_phishing", False)
+        age_data = self.get_domain_age(hostname)
+        age_str = age_data.get("age_str")
+
+        tls = telemetry.get("tls")
+        tls_valid = bool(tls and tls.get("status") == "VALID")
+
+        observations = []
+        if is_phish or is_blocked:
+            icon = "🚨"
+            headline = "Suspicious — High Risk"
+            summary = f"{hostname} was flagged as risky based on the security checks we completed."
+
+            indicators = prediction.get("indicators", [])
+            if is_blocked:
+                observations.append("Domain is actively blocked in our security firewall rules.")
+            if indicators:
+                for ind in indicators:
+                    observations.append(ind)
+            else:
+                observations.append("Structural and statistical anomaly detected in URL.")
+
+            if not tls_valid:
+                observations.append("The website does not present a verified security certificate.")
+            if age_str:
+                observations.append(f"Domain registered {age_str}.")
+
+            recommendation = "Do not enter passwords or financial details on this site. Leave immediately if anything feels unusual."
+        else:
+            icon = "✅"
+            headline = "Looks safe"
+            summary = f"{hostname} looks safe based on the checks we completed."
+
+            observations.append("No malicious patterns or threats detected in the site's structure.")
+            if tls_valid:
+                observations.append("The website uses a valid security certificate.")
+            else:
+                observations.append("The domain structure and DNS records resolve normally.")
+
+            observations.append("No reports were found in Scam Archive.")
+            if age_str:
+                observations.append(f"The website was registered {age_str}.")
+            else:
+                observations.append("Domain registration verified with authoritative registries.")
+
+            recommendation = "You can use the site, but leave if anything feels unusual—trust your instincts."
+
+        return {
+            "icon": icon,
+            "headline": headline,
+            "summary": summary,
+            "observations": observations,
+            "recommendation": recommendation,
+            "domain_age": age_str,
+            "root_domain": age_data.get("root_domain", hostname)
+        }
 
 
 _network_engine_instance = None

@@ -37,6 +37,15 @@ export interface PredictResponse {
     };
     error?: string;
   };
+  safety_report?: {
+    icon: string;
+    headline: string;
+    summary: string;
+    observations: string[];
+    recommendation: string;
+    domain_age?: string;
+    root_domain?: string;
+  };
 }
 
 export interface SocketPingResult {
