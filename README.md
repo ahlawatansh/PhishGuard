@@ -96,44 +96,6 @@ CN/
 
 ---
 
-## Running it locally
-
-**Prerequisites:** Python 3.10+, Node.js 18+, npm 9+
-
-```bash
-git clone https://github.com/ahlawatansh/phishguard-ai.git
-cd phishguard-ai
-
-# Install Python backend dependencies
-pip install -r requirements.txt
-
-# Install frontend dependencies and build static assets
-cd frontend
-npm install
-npm run build
-cd ..
-```
-
-Start the unified server (FastAPI serves both the API and the React frontend on port 8000):
-
-```bash
-uvicorn src.backend.main:app --host 0.0.0.0 --port 8000
-```
-
-Open **`http://localhost:8000`** in your browser.
-
-To run the automated test suite:
-```bash
-pytest
-```
-
-To retrain or benchmark the machine learning model:
-```bash
-python3 scripts/train_model.py
-```
-
----
-
 ## API
 
 | Method | Endpoint | Description |
