@@ -16,17 +16,62 @@ AUTHORITATIVE_ROOTS = {
     'apple.com', 'amazon.com', 'wikipedia.org', 'youtube.com', 'cloudflare.com',
     'facebook.com', 'instagram.com', 'linkedin.com', 'twitter.com', 'x.com',
     'telegram.org', 'netflix.com', 'zoom.us', 'openai.com', 'yahoo.com',
-    'reddit.com', 'spotify.com', 'paypal.com', 'dropbox.com', 'quora.com'
+    'reddit.com', 'spotify.com', 'paypal.com', 'dropbox.com', 'quora.com',
+    'mozilla.org', 'python.org'
 }
 
 INSTITUTIONAL_TLDS = ('.edu', '.ac.in', '.gov', '.gov.in', '.mil', '.edu.in', '.res.in')
+
+
+def validate_url(raw_url: str) -> Dict[str, Any]:
+    u = str(raw_url).strip()
+    if not u:
+        return {"valid": False, "reason": "URL cannot be empty", "category": "invalid"}
+
+    lower = u.lower()
+    for s in ('javascript:', 'file:', 'ftp:', 'data:', 'vbscript:', 'about:'):
+        if lower.startswith(s):
+            return {"valid": False, "reason": f"Unsupported URI scheme '{s[:-1]}'", "category": "invalid"}
+
+    if '://' in u:
+        scheme, remainder = u.split('://', 1)
+        if scheme.lower() not in ('http', 'https'):
+            return {"valid": False, "reason": f"Unsupported protocol '{scheme}'", "category": "invalid"}
+        if not remainder or remainder.startswith('/'):
+            return {"valid": False, "reason": "Missing or empty hostname in URL", "category": "invalid"}
+    else:
+        remainder = u
+
+    host_part = remainder.split('/')[0].split('?')[0].split('#')[0]
+    if '@' in host_part:
+        host_part = host_part.split('@')[-1]
+    if '\\' in host_part:
+        host_part = host_part.split('\\')[-1]
+
+    if ':' in host_part:
+        host_only, port_str = host_part.rsplit(':', 1)
+        if port_str.isdigit():
+            port = int(port_str)
+            if port < 1 or port > 65535:
+                return {"valid": False, "reason": f"Invalid TCP port number '{port}'", "category": "invalid"}
+            host_part = host_only
+        else:
+            return {"valid": False, "reason": f"Malformed port '{port_str}'", "category": "invalid"}
+
+    if not host_part or '..' in host_part or host_part.startswith('.') or host_part.endswith('.'):
+        return {"valid": False, "reason": "Malformed domain name syntax", "category": "invalid"}
+
+    if '.' not in host_part or ' ' in host_part:
+        return {"valid": False, "reason": f"'{raw_url}' is not a valid domain or URL format", "category": "invalid"}
+
+    return {"valid": True, "reason": "OK", "category": "valid"}
 
 
 def normalize_url(url: str) -> str:
     u = str(url).strip()
     if not u:
         return ""
-    if not u.startswith(('http://', 'https://', 'ftp://')):
+    if not u.startswith(('http://', 'https://')):
         u = 'https://' + u
     try:
         parsed = urlparse(u)

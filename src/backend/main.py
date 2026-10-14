@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from src.ml.predictor import get_predictor, normalize_url
+from src.ml.predictor import get_predictor, normalize_url, validate_url
 from src.backend.network_engine import get_network_engine
 
 app = FastAPI(
@@ -76,7 +76,11 @@ def get_model_info():
 def predict_url(req: PredictRequest):
     raw_url = req.url.strip()
     if not raw_url:
-        raise HTTPException(status_code=400, detail="URL cannot be empty")
+        raise HTTPException(status_code=422, detail="URL cannot be empty")
+
+    val_res = validate_url(raw_url)
+    if not val_res["valid"]:
+        raise HTTPException(status_code=422, detail=val_res["reason"])
 
     network_engine = get_network_engine()
     predictor = get_predictor()

@@ -471,6 +471,10 @@ class NetworkEngine:
         tls = telemetry.get("tls")
         tls_valid = bool(tls and tls.get("status") == "VALID")
 
+        dns_status = telemetry.get("dns_status", "UNKNOWN")
+        resolved_ips = telemetry.get("resolved_ips", [])
+        dns_failed = bool(dns_status == "FAILED" or len(resolved_ips) == 0)
+
         observations = []
         if is_phish or is_blocked:
             icon = ""
@@ -492,6 +496,20 @@ class NetworkEngine:
                 observations.append(f"Domain registered {age_str}.")
 
             recommendation = "Do not enter passwords or financial details on this site. Leave immediately if anything feels unusual."
+        elif dns_failed:
+            icon = ""
+            headline = "Server Not Found"
+            summary = f"No active server or IP address could be found for {hostname}."
+
+            observations.append("DNS lookup failed: The domain does not resolve to any active IP address.")
+            observations.append("No malicious patterns or threats detected in the site's structure, but the host is unreachable.")
+            observations.append("No verified TLS security certificate could be established.")
+            if age_str:
+                observations.append(f"The root domain '{age_data.get('root_domain', hostname)}' was originally registered {age_str}, but no active host records exist.")
+            else:
+                observations.append("No active DNS records or registration details found.")
+
+            recommendation = "This site cannot be reached because the domain does not resolve to any server. Check the URL for typos or verify if the domain has expired."
         else:
             icon = ""
             headline = "Looks safe"
