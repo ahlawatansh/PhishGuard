@@ -65,8 +65,17 @@ def extract_features(url: str) -> Dict[str, Any]:
     clean_host = hostname.split('@')[-1] if '@' in hostname else hostname
     clean_host_no_port = clean_host.split(':')[0]
 
+    COMPOUND_TLD_PREFIXES = {
+        'ac', 'co', 'edu', 'gov', 'org', 'net', 'mil', 'res', 'gen', 'ind', 'com', 'govt', 'ltd', 'ne', 'or', 'go'
+    }
+
     host_parts = clean_host_no_port.split('.')
-    if len(host_parts) >= 2:
+    if len(host_parts) >= 3 and host_parts[-2].lower() in COMPOUND_TLD_PREFIXES and len(host_parts[-1]) == 2:
+        tld_part = f"{host_parts[-2]}.{host_parts[-1]}"
+        tld_len = len(tld_part)
+        domain_part = host_parts[-3]
+        domain_len = len(domain_part)
+    elif len(host_parts) >= 2:
         tld_part = host_parts[-1]
         if tld_part.isalpha():
             tld_len = len(tld_part)

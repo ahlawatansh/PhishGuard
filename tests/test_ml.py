@@ -89,3 +89,10 @@ def test_legitimate_url_detection():
     res = predictor.predict(known_legit)
     assert res["verdict"] == "legitimate"
     assert res["risk_score"] < 0.5
+
+
+def test_institutional_cctld_detection():
+    predictor = get_predictor()
+    res = predictor.predict("https://vtop.vit.ac.in/")
+    assert res["verdict"] == "legitimate"
+    assert res["risk_score"] < 0.35
