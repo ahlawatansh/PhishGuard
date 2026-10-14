@@ -1,64 +1,110 @@
-# PhishGuard AI
+<div align="center">
 
-**Academic Title:** Machine Learning-Based Phishing URL Detection and Network Security Monitoring System  
-**Course Domain:** Computer Networks & Applied Artificial Intelligence  
-**Verified Model Test Accuracy:** **96.20%** (Exceeds the 95.0% target on 115,984 held-out test samples)
+# PhishGuard AI — Real-Time Phishing URL Detection & Network Defense
 
----
+**A machine learning cybersecurity system with pure URL lexical analysis, real-time TCP socket telemetry, DNS diagnostics, and an application-layer firewall.**
 
-## 1. Project Overview
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-18-61dafb.svg?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind-v3.4-38bdf8.svg?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![XGBoost](https://img.shields.io/badge/XGBoost-96.2%25%20Acc-FF6F00.svg)](https://xgboost.ai/)
+[![Vite](https://img.shields.io/badge/Vite-5.4-646cff.svg?logo=vite&logoColor=white)](https://vitejs.dev/)
 
-**PhishGuard AI** is an enterprise-grade cybersecurity web application and research platform that detects phishing URLs using genuine machine learning while demonstrating practical Computer Networks engineering concepts.
+### 🔗 Live: [phishguard-ai.onrender.com](https://phishguard-ai.onrender.com/)
 
-Unlike naive classifiers that rely on external API keys or crawl dangerous target websites, PhishGuard AI implements **Approach A: Pure URL-Only Lexical Inference**:
-- Extracts **55 deterministic structural, statistical, and Shannon entropy features** purely from the URL string.
-- Never crawls, visits, or executes untrusted links.
-- Evaluates inference in under **3 microseconds per URL** (< 0.003 ms).
-- Features a **Computer Networks Monitoring Engine** providing bounded socket DNS resolution, client-server request latency instrumentation, a simulated domain-level firewall blocklist, and an event audit trail.
-- Implements a minimalist dashboard adhering to the strict Google visual design system (black, white, neutral grays, single Google blue `#1A73E8` accent).
-
----
-
-## 2. Verified Machine Learning Results
-
-Trained and evaluated on **579,920 deduplicated URLs** (`archive (21)/final_dataset.csv`) using a stratified 80/20 train/test partition ($N_{\text{test}} = 115,984$ held-out samples, random seed 42) with zero target leakage:
-
-| Model Candidate | Test Accuracy | Precision (Phishing) | Recall (Phishing) | F1-Score | ROC-AUC | CPU Latency |
-|---|---|---|---|---|---|---|
-| **Logistic Regression** (L2) | 91.62% | 91.49% | 88.01% | 89.72% | 0.9727 | 0.0004 ms/sample |
-| **HistGradientBoosting** | 95.28% | 95.54% | 92.99% | 94.24% | 0.9902 | 0.0047 ms/sample |
-| **XGBoost Classifier (Selected)** | **96.20%** | **96.75%** | **94.02%** | **95.36%** | **0.9930** | **0.0029 ms/sample** |
-
-### Confusion Matrix on Unseen Held-Out Test Set
-- **True Negatives (Legitimate Correct):** 66,292
-- **False Positives (False Alarms):** 1,523 (Only 2.25% FPR)
-- **False Negatives (Missed Phishing):** 2,881 (5.98% FNR)
-- **True Positives (Phishing Blocked):** 45,288
+</div>
 
 ---
 
-## 3. Computer Networks Concepts Demonstrated
+## What it is
 
-1. **Client-Server Architecture:** Decoupled React/TypeScript Single Page Application communicating asynchronously with FastAPI via RESTful HTTP JSON payloads.
-2. **DNS Resolution & Domain Inspection:** Bounded, non-recursive socket DNS queries resolving IPv4 (A) and IPv6 (AAAA) records with duration tracking and timeout handling.
-3. **HTTP Request Latency Instrumentation:** Middleware calculating exact server processing duration ($\Delta T$) stamped into custom response headers (`X-Response-Time-Ms`) and aggregated for latency statistics.
-4. **Simulated Domain Firewall:** In-memory application-layer firewall allowing dynamic creation, deletion, and real-time interception of blocked traffic with security event logging.
-5. **Security Event Audit Trail:** Chronological log tracking predictions, DNS queries, and firewall events.
+I built PhishGuard AI because most phishing detectors either blindly query black-box external APIs, or crawl live destination web pages to parse HTML tags—a dangerous approach that exposes corporate networks to malicious drive-by downloads. 
+
+PhishGuard AI takes a deterministic approach: it extracts 55 structural, statistical, and Shannon entropy features directly from the raw URL string, evaluating threats in under 3 microseconds without ever visiting or rendering the target site. Coupled with a machine learning engine trained on over 579,000 verified URLs (achieving 96.20% accuracy), it pairs AI classification with real Computer Networks fundamentals—safe DNS lookups, live Layer 4 TCP 3-way handshake latency measurements, TLS certificate validation, and an in-memory application firewall that intercepts suspicious outbound requests.
 
 ---
 
-## 4. Quick Start & Local Execution
+## Features
 
-### 4.1 Prerequisites
-- Python 3.10+ (Tested on Python 3.14)
-- Node.js 18+ and npm
+**Deterministic Lexical ML** — extracts 55 zero-network features (length, directory depth, Shannon entropy, obfuscated hex/base64 sequences, TLD risk, sensitive credential keywords) purely from the URL string. Inference takes < 0.003 ms per sample.
 
-### 4.2 Installation
+**Live Network Telemetry** — inspects Layer 7 DNS (A and AAAA records), Layer 4 TCP SYN-ACK handshake round-trip time, and Layer 6 TLS 1.3 cryptographic handshakes in real time without executing untrusted web payloads.
+
+**Socket Latency & Jitter Probes** — sends back-to-back TCP socket probes to target hosts to calculate average RTT, jitter, and packet loss metrics directly from the browser dashboard.
+
+**Application-Layer Firewall** — an in-memory domain blocklist engine that intercepts URL prediction requests, prevents routing to confirmed phishing hosts, and tracks rule hits dynamically.
+
+**Security Event Logging** — real-time chronological audit trail capturing predictions, DNS resolutions, latency changes, and firewall interceptions with severity ratings (INFO, WARNING, CRITICAL).
+
+**Minimalist Dashboard** — responsive single-page dashboard built with React 18, TypeScript, and Tailwind, featuring a dedicated scanner, live network diagnostics, firewall rule management, model benchmark comparisons, and security event logs.
+
+---
+
+## Stack
+
+| Layer | Tech |
+|---|---|
+| Frontend | React 18, TypeScript, Tailwind CSS, Lucide Icons, Motion |
+| Backend | Python 3.11+, FastAPI, Uvicorn, Pydantic |
+| Machine Learning | XGBoost, Scikit-Learn, NumPy, Pandas, Joblib |
+| Network Telemetry | Python Sockets (`socket`, `ssl`), DNS resolution, TCP handshake tracking |
+| Build & Tests | Vite 5, Pytest, Pytest-Asyncio |
+
+---
+
+## Project structure
+
+```text
+CN/
+├── data/
+│   ├── training/                  # 580k URL training dataset & metadata
+│   ├── testing/                   # Held-out evaluation partitions
+│   └── raw/                       # Additional raw benchmark datasets
+├── frontend/                      # React 18 dashboard
+│   ├── dist/                      # Production compiled assets
+│   ├── src/                       # Components, scanner, telemetry UI & API client
+│   ├── index.html
+│   ├── package.json
+│   ├── tailwind.config.js
+│   └── vite.config.ts
+├── models/                        # Saved model artifacts & benchmark charts
+│   ├── best_model.joblib          # Trained XGBoost model artifact (96.20% test accuracy)
+│   ├── feature_names.json         # 55 deterministic lexical feature schemas
+│   ├── training_metrics.json      # Machine-readable test metrics
+│   ├── confusion_matrix.png       # Test set confusion matrix
+│   ├── feature_importance.png     # Top lexical feature rankings
+│   └── model_comparison.png       # Candidate benchmark bar charts
+├── scripts/
+│   └── train_model.py             # Reproducible training & evaluation pipeline
+├── src/
+│   ├── backend/
+│   │   ├── main.py                # FastAPI application & REST route definitions
+│   │   └── network_engine.py      # Socket telemetry, DNS resolver & simulated firewall
+│   └── ml/
+│       ├── feature_extractor.py   # Pure-Python 55 deterministic feature extractor
+│       └── predictor.py           # Model inference engine & risk scoring
+├── tests/
+│   ├── test_backend.py            # API endpoint & firewall lifecycle test suite
+│   └── test_ml.py                 # Feature extractor & predictor test suite
+├── pytest.ini                     # Direct pytest configuration
+├── render.yaml                    # Cloud deployment specification
+├── requirements.txt               # Backend Python dependencies
+└── README.md
+```
+
+---
+
+## Running it locally
+
+**Prerequisites:** Python 3.10+, Node.js 18+, npm 9+
+
 ```bash
-# Clone or navigate to the repository
-cd /path/to/CN
+git clone https://github.com/ahlawatansh/phishguard-ai.git
+cd phishguard-ai
 
-# Install Python dependencies
+# Install Python backend dependencies
 pip install -r requirements.txt
 
 # Install frontend dependencies and build static assets
@@ -68,134 +114,44 @@ npm run build
 cd ..
 ```
 
-### 4.3 Running the Application
-Start the unified FastAPI server (which automatically serves the compiled React dashboard):
+Start the unified server (FastAPI serves both the API and the React frontend on port 8000):
+
 ```bash
 uvicorn src.backend.main:app --host 0.0.0.0 --port 8000
 ```
-Open your browser to: **`http://localhost:8000`**
 
-### 4.4 Running Frontend in Development Mode (Optional)
-If modifying the React frontend:
+Open **`http://localhost:8000`** in your browser.
+
+To run the automated test suite:
 ```bash
-cd frontend
-npm run dev
-```
-Access the Vite dev server at `http://localhost:5173` (proxies `/api` to backend on port 8000).
-
----
-
-## 5. Project & Dataset Structure
-
-```text
-CN/
-├── data/
-│   ├── training/                  # Datasets used for model training
-│   │   ├── final_dataset.csv      # Primary 580k URL training dataset
-│   │   ├── train_dataset.csv      # Full training partition
-│   │   ├── Training.parquet       # Parquet format training data
-│   │   ├── dataset_info.txt       # Dataset metadata
-│   │   └── feature_description.csv# Lexical feature schemas
-│   ├── testing/                   # Datasets reserved for held-out evaluation
-│   │   ├── test_dataset.csv       # Held-out testing dataset
-│   │   └── Testing.parquet        # Testing partition in parquet format
-│   └── raw/                       # Additional cybersecurity benchmarks
-│       ├── PhiUSIIL_Phishing_URL_Dataset.csv
-│       ├── malicious_phish.csv
-│       ├── phishing_site_urls.csv
-│       ├── urldata.csv
-│       ├── phishing_url_dataset_unique.csv
-│       ├── partitioned_datasets/
-│       └── malicious_urls_2026/
-├── documentation/               # System architecture, research reports, viva guide & API docs
-├── frontend/                    # React + TypeScript + Tailwind dashboard
-├── models/                      # Saved model artifact, evaluation plots & metrics
-├── scripts/                     # Model training & evaluation pipeline (train_model.py)
-├── src/
-│   ├── backend/                 # FastAPI application & Network Engine
-│   └── ml/                      # Feature extractor & Predictor
-├── tests/                       # Backend and ML unit test suites
-├── pytest.ini                   # Test configuration
-├── requirements.txt             # Python package dependencies
-├── render.yaml                  # Cloud deployment specification
-└── README.md                    # Project documentation
+pytest
 ```
 
----
-
-## 6. Model Retraining Pipeline
-
-The training pipeline is fully reproducible from the command line:
+To retrain or benchmark the machine learning model:
 ```bash
-# Run full training on the 580k dataset
 python3 scripts/train_model.py
-
-# Optional: Run on a subset for quick experimentation
-python3 scripts/train_model.py --max_records 50000 --test_size 0.2
 ```
 
-Outputs are automatically saved to `models/`:
-- `best_model.joblib`: Compressed XGBoost model (1.54 MB).
-- `feature_names.json`: Schema of all 55 lexical features.
-- `training_metrics.json`: Machine-readable evaluation metrics.
-- `confusion_matrix.png`: High-resolution confusion matrix chart.
-- `model_comparison.png`: Architectural benchmark graph.
-- `feature_importance.png`: Feature rankings.
+---
+
+## API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/health` | Health check, model status, and service uptime |
+| `GET` | `/api/model/info` | Trained model architecture, accuracy, and feature schema |
+| `POST` | `/api/predict` | Classify URL, extract 55 features, and inspect firewall rules |
+| `GET` | `/api/network/dns` | Non-recursive bounded DNS resolution for domain (A / AAAA) |
+| `GET` | `/api/network/ping` | Layer 4 TCP socket latency and jitter probe |
+| `GET` | `/api/network/stats` | Aggregated latency, request volume, and network metrics |
+| `GET` | `/api/events` | Retrieve chronological security event audit trail |
+| `GET` | `/api/firewall/rules` | List simulated domain-blocking firewall rules |
+| `POST` | `/api/firewall/rules` | Add a new domain block rule |
+| `DELETE` | `/api/firewall/rules/{id}` | Delete a simulated firewall rule |
+| `GET` | `/api/metrics` | System-wide combined network and ML performance summary |
 
 ---
 
-## 7. Running Automated Tests
-
-Run the comprehensive unit and integration test suite:
-```bash
-python3 -m pytest -v tests/
-```
-All 19 test cases validate ML feature extraction, boundary handling, entropy calculations, API endpoints, DNS lookups, and firewall rule lifecycles.
-
----
-
-## 8. Deployment to Render
-
-The repository is configured for one-click deployment on Render:
-
-1. Push this repository to GitHub or GitLab.
-2. In the Render Dashboard, click **New > Web Service**.
-3. Connect your repository.
-4. Render will automatically detect `render.yaml`. Alternatively, configure:
-   - **Environment:** `Python`
-   - **Build Command:** `pip install -r requirements.txt && cd frontend && npm install && npm run build && cd ..`
-   - **Start Command:** `uvicorn src.backend.main:app --host 0.0.0.0 --port $PORT`
-5. The deployed web service serves both the API endpoints and the dashboard on port `$PORT`.
-
----
-
-## 9. Wireshark Network Packet Inspection Guide
-
-To demonstrate network packet analysis for Computer Networks lab requirements:
-1. Open Wireshark and select your active network interface (e.g., `Loopback: lo0` for localhost, or `en0` for Wi-Fi).
-2. Set display filter to:
-   ```wireshark
-   tcp.port == 8000 || dns
-   ```
-3. In PhishGuard AI, submit a URL or execute a DNS lookup.
-4. In Wireshark, observe:
-   - **TCP Handshake:** `[SYN]`, `[SYN, ACK]`, `[ACK]` establishing connection.
-   - **HTTP POST Request:** Inspect HTTP headers and JSON payload containing the URL.
-   - **HTTP Response:** Inspect the `200 OK` status, custom `X-Response-Time-Ms` latency header, and JSON prediction.
-   - **DNS Queries:** For domain lookups, observe UDP packets to port 53 requesting standard A/AAAA queries.
-
----
-
-## 10. Documentation Directory Index
-
-- [System Architecture](documentation/architecture.md)
-- [Computer Networks Viva Guide](documentation/computer_networks_viva.md)
-- [REST API Reference](documentation/api.md)
-- [5-Minute Demonstration Script](documentation/project_demo_script.md)
-- [Automated Test Results](documentation/test_results.md)
-- [Model Evaluation Report](documentation/model_evaluation.md)
-- [Dataset Research Report](documentation/dataset_research.md)
-- [Workspace Inventory](documentation/workspace_inventory.md)
-- [Model Training Summary](documentation/training_summary.md)
-- [Dataset Specifications](documentation/DATASET_README.md)
-- [Dataset Licenses](documentation/dataset_licenses.md)
+<div align="center">
+<sub>Built by <a href="https://github.com/ahlawatansh">Ansh Ahlawat</a> · CSE undergrad, VIT Vellore</sub>
+</div>
