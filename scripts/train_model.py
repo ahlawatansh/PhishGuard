@@ -145,7 +145,7 @@ def plot_model_comparison(comparison_df, save_path):
 def main():
     args = parse_args()
     os.makedirs(args.output_dir, exist_ok=True)
-    os.makedirs("reports", exist_ok=True)
+    os.makedirs("documentation", exist_ok=True)
 
     print("=" * 70)
     print("PHISHGUARD AI - PRODUCTION MODEL TRAINING PIPELINE")
@@ -310,7 +310,7 @@ def main():
         fi_plot_path = os.path.join(args.output_dir, "feature_importance.png")
         plot_feature_importance(best_model.feature_importances_, FEATURE_NAMES, fi_plot_path)
 
-    summary_md_path = os.path.join(args.output_dir, "training_summary.md")
+    summary_md_path = os.path.join("documentation", "training_summary.md")
     summary_lines = [
         f"# Model Training & Evaluation Summary - PhishGuard AI\n",
         f"- Trained Model: `{best_name}`\n",

@@ -107,19 +107,18 @@ CN/
 │       ├── phishing_url_dataset_unique.csv
 │       ├── partitioned_datasets/
 │       └── malicious_urls_2026/
-├── docs/                          # Viva guide, API docs, demo script
-├── frontend/                      # React + TypeScript + Tailwind dashboard
-├── models/                        # Saved model artifact, evaluation plots & metrics
-├── reports/                       # Academic reports & model evaluation benchmarks
-├── scripts/                       # Model training & evaluation pipeline (train_model.py)
+├── documentation/               # System architecture, research reports, viva guide & API docs
+├── frontend/                    # React + TypeScript + Tailwind dashboard
+├── models/                      # Saved model artifact, evaluation plots & metrics
+├── scripts/                     # Model training & evaluation pipeline (train_model.py)
 ├── src/
-│   ├── backend/                   # FastAPI application & Network Engine
-│   └── ml/                        # Feature extractor & Predictor
-├── tests/                         # Backend and ML unit test suites
-├── pytest.ini                     # Test configuration
-├── requirements.txt               # Python package dependencies
-├── render.yaml                    # Cloud deployment specification
-└── README.md                      # Project documentation
+│   ├── backend/                 # FastAPI application & Network Engine
+│   └── ml/                      # Feature extractor & Predictor
+├── tests/                       # Backend and ML unit test suites
+├── pytest.ini                   # Test configuration
+├── requirements.txt             # Python package dependencies
+├── render.yaml                  # Cloud deployment specification
+└── README.md                    # Project documentation
 ```
 
 ---
@@ -189,12 +188,14 @@ To demonstrate network packet analysis for Computer Networks lab requirements:
 
 ## 10. Documentation Directory Index
 
-- [Workspace Inventory](reports/workspace_inventory.md)
-- [Dataset Research Report](reports/dataset_research.md)
-- [Model Evaluation Report](reports/model_evaluation.md)
-- [Automated Test Results](reports/test_results.md)
-- [System Architecture](reports/architecture.md)
-- [REST API Reference](docs/api.md)
-- [Computer Networks Viva Guide](docs/computer_networks_viva.md)
-- [5-Minute Demonstration Script](docs/project_demo_script.md)
-- [Dataset Licenses](docs/dataset_licenses.md)
+- [System Architecture](documentation/architecture.md)
+- [Computer Networks Viva Guide](documentation/computer_networks_viva.md)
+- [REST API Reference](documentation/api.md)
+- [5-Minute Demonstration Script](documentation/project_demo_script.md)
+- [Automated Test Results](documentation/test_results.md)
+- [Model Evaluation Report](documentation/model_evaluation.md)
+- [Dataset Research Report](documentation/dataset_research.md)
+- [Workspace Inventory](documentation/workspace_inventory.md)
+- [Model Training Summary](documentation/training_summary.md)
+- [Dataset Specifications](documentation/DATASET_README.md)
+- [Dataset Licenses](documentation/dataset_licenses.md)
