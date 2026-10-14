@@ -442,7 +442,7 @@ class NetworkEngine:
 
         observations = []
         if is_phish or is_blocked:
-            icon = "🚨"
+            icon = ""
             headline = "Suspicious — High Risk"
             summary = f"{hostname} was flagged as risky based on the security checks we completed."
 
@@ -462,7 +462,7 @@ class NetworkEngine:
 
             recommendation = "Do not enter passwords or financial details on this site. Leave immediately if anything feels unusual."
         else:
-            icon = "✅"
+            icon = ""
             headline = "Looks safe"
             summary = f"{hostname} looks safe based on the checks we completed."
 

@@ -476,18 +476,15 @@ export function App() {
                     <div className="pt-6 border-b border-slate-100 pb-6">
                       <div className="bg-slate-50/80 border border-slate-200/80 rounded-2xl p-5 sm:p-6 space-y-4">
                         <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xl leading-none">{scanResult.safety_report.icon}</span>
-                            <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                              {scanResult.safety_report.headline}
-                            </h3>
-                          </div>
-                          <p className="text-xs sm:text-sm font-medium text-slate-600 pl-7">
+                          <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                            {scanResult.safety_report.headline}
+                          </h3>
+                          <p className="text-xs sm:text-sm font-medium text-slate-600">
                             {scanResult.safety_report.summary}
                           </p>
                         </div>
 
-                        <div className="pt-2 pl-7 space-y-2">
+                        <div className="pt-2 space-y-2">
                           <h4 className="text-xs font-black uppercase tracking-wider text-slate-800">
                             What I noticed
                           </h4>
@@ -501,7 +498,7 @@ export function App() {
                           </ul>
                         </div>
 
-                        <div className="pt-3 pl-7 border-t border-slate-200/60 space-y-1">
+                        <div className="pt-3 border-t border-slate-200/60 space-y-1">
                           <h4 className="text-xs font-black uppercase tracking-wider text-slate-800">
                             Recommended
                           </h4>
