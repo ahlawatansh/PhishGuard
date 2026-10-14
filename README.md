@@ -12,7 +12,7 @@
 [![XGBoost](https://img.shields.io/badge/XGBoost-96.2%25%20Acc-FF6F00.svg)](https://xgboost.ai/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-646cff.svg?logo=vite&logoColor=white)](https://vitejs.dev/)
 
-### 🔗 Live: ([https://phishguard-ai.onrender.com/](https://phishguard-k45w.onrender.com/))
+### 🔗 Live: https://phishguard-k45w.onrender.com/
 
 </div>
 
